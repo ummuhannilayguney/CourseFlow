@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Ders Programı{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <h1><i class="fas fa-calendar-alt"></i> Ders Programı</h1>
+        <p>Haftalık ders programınız</p>
+    </div>
+    
+    {% if enrollments %}
+        <!-- Program Özeti -->
+        <div class="schedule-summary">
+            <div class="summary-card">
+                <span class="summary-value">{{ enrollments|length }}</span>
+                <span class="summary-label">Toplam Ders</span>
+            </div>
+            <div class="summary-card">
+                <span class="summary-value">{{ enrollments|sum(attribute='course.credit') }}</span>
+                <span class="summary-label">Toplam Kredi</span>
+            </div>
+        </div>
+        
+        <!-- Haftalık Program Tablosu -->
+        <div class="schedule-table-container">
+            <table class="schedule-table">
+                <thead>
+                    <tr>
+                        <th class="time-column">Saat</th>
+                        <th>Pazartesi</th>
+                        <th>Salı</th>
+                        <th>Çarşamba</th>
+                        <th>Perşembe</th>
+                        <th>Cuma</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hour in range(8, 20) %}
+                        <tr>
+                            <td class="time-cell">{{ "%02d:00"|format(hour) }}</td>
+                            {% for day in ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma'] %}
+                                <td class="schedule-cell">
+                                    {% for item in weekly_schedule[day] %}
+                                        {% set start_hour = item.schedule.start_time.split(':')[0]|int %}
+                                        {% set end_hour = item.schedule.end_time.split(':')[0]|int %}
+                                        {% if start_hour == hour %}
+                                            <div class="schedule-block" style="height: {{ (end_hour - start_hour) * 60 }}px;">
+                                                <span class="block-code">{{ item.course.code }}</span>
+                                                <span class="block-name">{{ item.course.name[:20] }}{% if item.course.name|length > 20 %}...{% endif %}</span>
+                                                <span class="block-time">{{ item.schedule.start_time }}-{{ item.schedule.end_time }}</span>
+                                                {% if item.schedule.classroom %}
+                                                    <span class="block-room">{{ item.schedule.classroom }}</span>
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Ders Listesi -->
+        <div class="enrolled-courses-list">
+            <h2><i class="fas fa-list"></i> Kayıtlı Dersler</h2>
+            <div class="courses-grid compact">
+                {% for enrollment in enrollments %}
+                    <div class="course-card compact">
+                        <div class="course-header">
+                            <span class="course-code-badge">{{ enrollment.course.code }}</span>
+                        </div>
+                        <h4>{{ enrollment.course.name }}</h4>
+                        <div class="course-details">
+                            <span><i class="fas fa-clock"></i> {{ enrollment.course.get_schedule_display() }}</span>
+                            <span><i class="fas fa-graduation-cap"></i> {{ enrollment.course.credit }} Kredi</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-calendar-times"></i>
+            <h2>Ders Programınız Boş</h2>
+            <p>Henüz kayıtlı dersiniz yok. Ders seçimi yaparak başlayın.</p>
+            <a href="{{ url_for('student.course_catalog') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-search"></i> Ders Kataloğu
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

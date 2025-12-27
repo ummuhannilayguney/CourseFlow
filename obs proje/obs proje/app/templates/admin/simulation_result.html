@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}Simülasyon Raporu{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="breadcrumb">
+        <a href="{{ url_for('admin.simulation') }}"><i class="fas fa-arrow-left"></i> Simülasyonlar</a>
+    </div>
+    
+    <div class="page-header">
+        <h1><i class="fas fa-chart-bar"></i> Simülasyon Raporu</h1>
+        <p>{{ report.metrics.semester|default('') }} - {{ report.metrics.completed_at[:10] if report.metrics.completed_at and report.metrics.completed_at|length > 10 else (report.metrics.completed_at|default('')) }}</p>
+    </div>
+    
+    <!-- Özet Kartları -->
+    <div class="stats-grid report-stats">
+        <div class="stat-card">
+            <div class="stat-icon bg-primary">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">{{ report.metrics.total_students }}</span>
+                <span class="stat-label">Toplam Öğrenci</span>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon bg-info">
+                <i class="fas fa-clipboard-list"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">{{ report.metrics.total_requests }}</span>
+                <span class="stat-label">Toplam Talep</span>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon bg-success">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">{{ report.metrics.total_approved }}</span>
+                <span class="stat-label">Onaylanan</span>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon bg-danger">
+                <i class="fas fa-times-circle"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">{{ report.metrics.total_rejected }}</span>
+                <span class="stat-label">Reddedilen</span>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon bg-warning">
+                <i class="fas fa-percentage"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">%{{ report.metrics.avg_approval_rate }}</span>
+                <span class="stat-label">Onay Oranı</span>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon bg-secondary">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">{{ report.metrics.processing_time_seconds }}s</span>
+                <span class="stat-label">İşlem Süresi</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="report-grid">
+        <!-- Reddedilme Sebepleri -->
+        <div class="report-card">
+            <h3><i class="fas fa-exclamation-triangle"></i> Reddedilme Sebepleri</h3>
+            {% set quota_pct = report.rejection_breakdown.quota_percentage|default(0) %}
+            {% set conflict_pct = report.rejection_breakdown.conflict_percentage|default(0) %}
+            {% set prereq_pct = report.rejection_breakdown.prerequisite_percentage|default(0) %}
+            <div class="rejection-breakdown">
+                <div class="rejection-item">
+                    <div class="rejection-bar">
+                        <div class="bar-fill bg-warning" style="width: {{ quota_pct }}%"></div>
+                    </div>
+                    <div class="rejection-info">
+                        <span class="rejection-label">Kontenjan Doldu</span>
+                        <span class="rejection-count">{{ report.metrics.rejected_quota|default(0) }} (%{{ quota_pct }})</span>
+                    </div>
+                </div>
+                
+                <div class="rejection-item">
+                    <div class="rejection-bar">
+                        <div class="bar-fill bg-danger" style="width: {{ conflict_pct }}%"></div>
+                    </div>
+                    <div class="rejection-info">
+                        <span class="rejection-label">Saat Çakışması</span>
+                        <span class="rejection-count">{{ report.metrics.rejected_conflict|default(0) }} (%{{ conflict_pct }})</span>
+                    </div>
+                </div>
+                
+                <div class="rejection-item">
+                    <div class="rejection-bar">
+                        <div class="bar-fill bg-info" style="width: {{ prereq_pct }}%"></div>
+                    </div>
+                    <div class="rejection-info">
+                        <span class="rejection-label">Ön Şart Eksik</span>
+                        <span class="rejection-count">{{ report.metrics.rejected_prerequisite|default(0) }} (%{{ prereq_pct }})</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Öğrenci Analizi -->
+        <div class="report-card">
+            <h3><i class="fas fa-user-check"></i> Öğrenci Analizi</h3>
+            <div class="student-analysis">
+                <div class="analysis-item success">
+                    <span class="analysis-count">{{ report.student_analysis.full_enrollment }}</span>
+                    <span class="analysis-label">Tüm derslerini alan</span>
+                </div>
+                <div class="analysis-item warning">
+                    <span class="analysis-count">{{ report.student_analysis.partial_enrollment }}</span>
+                    <span class="analysis-label">Kısmen alan</span>
+                </div>
+                <div class="analysis-item danger">
+                    <span class="analysis-count">{{ report.student_analysis.no_enrollment }}</span>
+                    <span class="analysis-label">Hiç alamayan</span>
+                </div>
+            </div>
+            <p class="analysis-note">Başarı Oranı: %{{ report.student_analysis.success_rate }}</p>
+        </div>
+        
+        <!-- Ders Analizi -->
+        <div class="report-card">
+            <h3><i class="fas fa-book"></i> Ders Analizi</h3>
+            <div class="course-analysis">
+                <div class="analysis-item">
+                    <span class="analysis-count">{{ report.course_analysis.total_courses }}</span>
+                    <span class="analysis-label">Toplam Ders</span>
+                </div>
+                <div class="analysis-item danger">
+                    <span class="analysis-count">{{ report.course_analysis.full_courses }}</span>
+                    <span class="analysis-label">Kontenjanı Dolan</span>
+                </div>
+                <div class="analysis-item warning">
+                    <span class="analysis-count">{{ report.course_analysis.empty_courses }}</span>
+                    <span class="analysis-label">Hiç Kayıt Olmayan</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- En Çok Talep Edilen Dersler -->
+        <div class="report-card wide">
+            <h3><i class="fas fa-fire"></i> En Çok Talep Edilen Dersler</h3>
+            <div class="table-container">
+                <table class="data-table compact">
+                    <thead>
+                        <tr>
+                            <th>Kod</th>
+                            <th>Ders Adı</th>
+                            <th>Kayıtlı</th>
+                            <th>Kontenjan</th>
+                            <th>Doluluk</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for course in report.course_analysis.most_requested %}
+                            {% set fill_rate = course.fill_rate|default(0) %}
+                            <tr>
+                                <td><strong>{{ course.code }}</strong></td>
+                                <td>{{ course.name }}</td>
+                                <td>{{ course.enrolled }}</td>
+                                <td>{{ course.quota }}</td>
+                                <td>
+                                    <div class="mini-progress">
+                                        <div class="mini-progress-bar {% if fill_rate >= 90 %}bg-danger{% elif fill_rate >= 70 %}bg-warning{% else %}bg-success{% endif %}" 
+                                             style="width: {{ fill_rate }}%"></div>
+                                    </div>
+                                    <span>%{{ fill_rate }}</span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Ek Metrikler -->
+    <div class="additional-metrics">
+        <h3><i class="fas fa-chart-line"></i> Ek Metrikler</h3>
+        <div class="metrics-grid">
+            <div class="metric-item">
+                <span class="metric-value">{{ report.metrics.avg_courses_per_student }}</span>
+                <span class="metric-label">Öğrenci başına ortalama ders</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-value">{{ report.metrics.total_waitlist }}</span>
+                <span class="metric-label">Bekleme listesine alınan</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-value">{{ report.metrics.courses_full }}</span>
+                <span class="metric-label">Kontenjanı dolan ders</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

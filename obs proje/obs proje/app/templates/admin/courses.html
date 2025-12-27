@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Ders Yönetimi{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="page-header">
+        <h1><i class="fas fa-book"></i> Ders Yönetimi</h1>
+        <a href="{{ url_for('admin.add_course') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Yeni Ders Ekle
+        </a>
+    </div>
+    
+    <!-- Arama -->
+    <div class="search-section">
+        <form method="GET" class="search-form">
+            <input type="text" name="keyword" placeholder="Ders kodu veya adı ara..." 
+                   value="{{ request.args.get('keyword', '') }}" class="search-input">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i> Ara
+            </button>
+        </form>
+    </div>
+    
+    <!-- Ders Tablosu -->
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Kod</th>
+                    <th>Ders Adı</th>
+                    <th>Bölüm</th>
+                    <th>Kredi</th>
+                    <th>Kontenjan</th>
+                    <th>Doluluk</th>
+                    <th>Tür</th>
+                    <th>Durum</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for course in courses %}
+                    <tr>
+                        <td><strong>{{ course.code }}</strong></td>
+                        <td>{{ course.name }}</td>
+                        <td>{{ course.department }}</td>
+                        <td>{{ course.credit }}</td>
+                        <td>{{ course.enrolled_count }}/{{ course.quota }}</td>
+                        <td>
+                            <div class="mini-progress">
+                                <div class="mini-progress-bar {% if course.fill_percentage >= 90 %}bg-danger{% elif course.fill_percentage >= 70 %}bg-warning{% else %}bg-success{% endif %}" 
+                                     style="width: {{ course.fill_percentage }}%"></div>
+                            </div>
+                            <span class="progress-text">%{{ course.fill_percentage }}</span>
+                        </td>
+                        <td>
+                            <span class="badge badge-{{ course.course_type }}">
+                                {% if course.course_type == 'required' %}Zorunlu
+                                {% elif course.course_type == 'elective' %}Seçmeli
+                                {% else %}Teknik{% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            {% if course.is_open %}
+                                <span class="badge badge-success">Açık</span>
+                            {% else %}
+                                <span class="badge badge-danger">Kapalı</span>
+                            {% endif %}
+                        </td>
+                        <td class="actions-cell">
+                            <a href="{{ url_for('admin.edit_course', course_id=course.id) }}" class="btn btn-sm btn-outline" title="Düzenle">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form method="POST" action="{{ url_for('admin.delete_course', course_id=course.id) }}" 
+                                  style="display: inline;" onsubmit="return confirm('Bu dersi silmek istediğinize emin misiniz?');">
+                                <button type="submit" class="btn btn-sm btn-danger" title="Sil">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="9" class="empty-cell">
+                            <div class="empty-state">
+                                <i class="fas fa-book"></i>
+                                <p>Ders bulunamadı</p>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Transkript{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <h1><i class="fas fa-file-alt"></i> Transkript</h1>
+        <p>Tamamladığınız dersler ve notlarınız</p>
+    </div>
+    
+    {% if completed %}
+        <div class="transcript-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Ders Kodu</th>
+                        <th>Ders Adı</th>
+                        <th>Kredi</th>
+                        <th>Not</th>
+                        <th>Dönem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for course in completed %}
+                        <tr>
+                            <td><strong>{{ course.course_code }}</strong></td>
+                            <td>{{ course.course_name }}</td>
+                            <td>{{ course.credit }}</td>
+                            <td>
+                                <span class="grade-badge grade-{{ course.grade }}">{{ course.grade }}</span>
+                            </td>
+                            <td>{{ course.semester }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-graduation-cap"></i>
+            <h2>Transkript Boş</h2>
+            <p>Henüz tamamlanmış dersiniz bulunmuyor.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

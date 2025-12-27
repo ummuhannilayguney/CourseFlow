@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1><i class="fas fa-tachometer-alt"></i> Admin Panel</h1>
+        <p>Sistem yönetimi ve izleme</p>
+    </div>
+    
+    <!-- İstatistik Kartları -->
+    <div class="stats-grid admin-stats">
+        <div class="stat-card">
+            <div class="stat-icon bg-primary">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">{{ stats.students }}</span>
+                <span class="stat-label">Öğrenci</span>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon bg-success">
+                <i class="fas fa-book"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">{{ stats.courses }}</span>
+                <span class="stat-label">Aktif Ders</span>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon bg-warning">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">{{ stats.pending_requests }}</span>
+                <span class="stat-label">Bekleyen Talep</span>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon bg-info">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">{{ stats.enrollments }}</span>
+                <span class="stat-label">Onaylı Kayıt</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="admin-grid">
+        <!-- Son Simülasyon -->
+        <div class="admin-card">
+            <div class="card-header">
+                <h2><i class="fas fa-play-circle"></i> Son Simülasyon</h2>
+                <a href="{{ url_for('admin.simulation') }}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-play"></i> Yeni Simülasyon
+                </a>
+            </div>
+            <div class="card-body">
+                {% if latest_simulation %}
+                    <div class="simulation-summary">
+                        <div class="summary-item">
+                            <span class="label">Dönem</span>
+                            <span class="value">{{ latest_simulation.semester }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">Tarih</span>
+                            <span class="value">{{ latest_simulation.completed_at.strftime('%d.%m.%Y %H:%M') if latest_simulation.completed_at else '-' }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">Toplam Talep</span>
+                            <span class="value">{{ latest_simulation.total_requests }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">Onaylanan</span>
+                            <span class="value text-success">{{ latest_simulation.total_approved }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">Reddedilen</span>
+                            <span class="value text-danger">{{ latest_simulation.total_rejected }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">Onay Oranı</span>
+                            <span class="value">%{{ "%.1f"|format(latest_simulation.avg_approval_rate) }}</span>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('admin.simulation_result', simulation_id=latest_simulation.id) }}" class="btn btn-outline btn-sm">
+                        <i class="fas fa-chart-bar"></i> Detaylı Rapor
+                    </a>
+                {% else %}
+                    <div class="empty-state small">
+                        <i class="fas fa-play-circle"></i>
+                        <p>Henüz simülasyon çalıştırılmadı</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Kontenjanı Dolan Dersler -->
+        <div class="admin-card">
+            <div class="card-header">
+                <h2><i class="fas fa-exclamation-triangle"></i> Kontenjanı Dolan Dersler</h2>
+            </div>
+            <div class="card-body">
+                {% if full_courses %}
+                    <ul class="full-courses-list">
+                        {% for course in full_courses[:5] %}
+                            <li>
+                                <span class="course-code">{{ course.code }}</span>
+                                <span class="course-name">{{ course.name }}</span>
+                                <span class="badge badge-danger">Dolu</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    {% if full_courses|length > 5 %}
+                        <p class="more-text">+{{ full_courses|length - 5 }} ders daha</p>
+                    {% endif %}
+                {% else %}
+                    <div class="empty-state small">
+                        <i class="fas fa-check-circle"></i>
+                        <p>Tüm derslerde kontenjan mevcut</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Hızlı Eylemler -->
+        <div class="admin-card">
+            <div class="card-header">
+                <h2><i class="fas fa-bolt"></i> Hızlı Eylemler</h2>
+            </div>
+            <div class="card-body">
+                <div class="quick-actions-list">
+                    <a href="{{ url_for('admin.add_course') }}" class="quick-action">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Yeni Ders Ekle</span>
+                    </a>
+                    <a href="{{ url_for('admin.students') }}" class="quick-action">
+                        <i class="fas fa-user-cog"></i>
+                        <span>Öğrenci Yönetimi</span>
+                    </a>
+                    <a href="{{ url_for('admin.simulation') }}" class="quick-action">
+                        <i class="fas fa-play"></i>
+                        <span>Simülasyon Çalıştır</span>
+                    </a>
+                    <a href="{{ url_for('admin.reports') }}" class="quick-action">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Raporları Görüntüle</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

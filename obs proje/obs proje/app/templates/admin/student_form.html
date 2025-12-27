@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Öğrenci Düzenle{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="breadcrumb">
+        <a href="{{ url_for('admin.student_detail', student_id=student.id) }}"><i class="fas fa-arrow-left"></i> Öğrenci Detay</a>
+    </div>
+    
+    <div class="form-container">
+        <h1>{{ student.full_name }} - Düzenle</h1>
+        
+        <form method="POST" class="admin-form">
+            <div class="form-section">
+                <h3>Kişisel Bilgiler</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="first_name">Ad *</label>
+                        <input type="text" id="first_name" name="first_name" 
+                               value="{{ student.first_name }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="last_name">Soyad *</label>
+                        <input type="text" id="last_name" name="last_name" 
+                               value="{{ student.last_name }}" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Öğrenci Numarası</label>
+                    <input type="text" value="{{ student.student_number }}" readonly disabled>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3>Akademik Bilgiler</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="class_level">Sınıf *</label>
+                        <select id="class_level" name="class_level" required>
+                            <option value="1" {% if student.class_level == 1 %}selected{% endif %}>1. Sınıf</option>
+                            <option value="2" {% if student.class_level == 2 %}selected{% endif %}>2. Sınıf</option>
+                            <option value="3" {% if student.class_level == 3 %}selected{% endif %}>3. Sınıf</option>
+                            <option value="4" {% if student.class_level == 4 %}selected{% endif %}>4. Sınıf</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="gpa">Not Ortalaması (GPA) *</label>
+                        <input type="number" id="gpa" name="gpa" 
+                               value="{{ student.gpa }}" min="0" max="4" step="0.01" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="remaining_courses">Mezuniyete Kalan Ders *</label>
+                        <input type="number" id="remaining_courses" name="remaining_courses" 
+                               value="{{ student.remaining_courses }}" min="0" max="100" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="special_status">Özel Durum</label>
+                    <select id="special_status" name="special_status">
+                        <option value="none" {% if student.special_status == 'none' %}selected{% endif %}>Yok</option>
+                        <option value="scholarship" {% if student.special_status == 'scholarship' %}selected{% endif %}>Burslu</option>
+                        <option value="double_major" {% if student.special_status == 'double_major' %}selected{% endif %}>Çift Anadal</option>
+                        <option value="honor_student" {% if student.special_status == 'honor_student' %}selected{% endif %}>Onur Öğrencisi</option>
+                        <option value="exchange" {% if student.special_status == 'exchange' %}selected{% endif %}>Değişim Öğrencisi</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <a href="{{ url_for('admin.student_detail', student_id=student.id) }}" class="btn btn-outline">İptal</a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Kaydet
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Öğrenci Paneli{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1><i class="fas fa-home"></i> Hoş Geldiniz, {{ current_user.first_name }}!</h1>
+        <p class="subtitle">Ders kayıt işlemlerinizi buradan yönetebilirsiniz.</p>
+    </div>
+    
+    <!-- Öncelik Kartı -->
+    <div class="priority-overview">
+        <div class="priority-card">
+            <div class="priority-score">
+                <span class="score-value">{{ "%.1f"|format(priority.total_score) }}</span>
+                <span class="score-label">Öncelik Puanı</span>
+            </div>
+            <div class="priority-details">
+                <div class="detail-item">
+                    <span class="label">Sınıf</span>
+                    <span class="value">{{ current_user.class_level }}. Sınıf</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">GPA</span>
+                    <span class="value">{{ "%.2f"|format(current_user.gpa) }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Kalan Ders</span>
+                    <span class="value">{{ current_user.remaining_courses }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Durum</span>
+                    <span class="value badge badge-{{ 'success' if current_user.special_status != 'none' else 'secondary' }}">
+                        {{ priority.breakdown.special_status.description }}
+                    </span>
+                </div>
+            </div>
+            <a href="{{ url_for('student.priority_info') }}" class="btn btn-outline btn-sm">
+                <i class="fas fa-info-circle"></i> Detay
+            </a>
+        </div>
+    </div>
+    
+    <!-- Hızlı Erişim Kartları -->
+    <div class="quick-actions">
+        <a href="{{ url_for('student.course_catalog') }}" class="action-card">
+            <div class="action-icon bg-primary">
+                <i class="fas fa-search"></i>
+            </div>
+            <h3>Ders Ara</h3>
+            <p>Ders kataloğunu inceleyin</p>
+        </a>
+        
+        <a href="{{ url_for('student.cart') }}" class="action-card">
+            <div class="action-icon bg-warning">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+            <h3>Sepetim</h3>
+            <p>{{ cart|length }} ders seçili</p>
+        </a>
+        
+        <a href="{{ url_for('student.schedule') }}" class="action-card">
+            <div class="action-icon bg-success">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+            <h3>Ders Programı</h3>
+            <p>{{ enrollments|length }} ders kayıtlı</p>
+        </a>
+        
+        <a href="{{ url_for('student.transcript') }}" class="action-card">
+            <div class="action-icon bg-info">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <h3>Transkript</h3>
+            <p>Geçmiş dersler</p>
+        </a>
+    </div>
+    
+    <div class="dashboard-grid">
+        <!-- Sepet Özeti -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h2><i class="fas fa-shopping-cart"></i> Sepetim</h2>
+                <a href="{{ url_for('student.cart') }}" class="btn btn-sm btn-outline">Tümünü Gör</a>
+            </div>
+            <div class="card-body">
+                {% if cart %}
+                    <ul class="course-list">
+                        {% for item in cart[:5] %}
+                            <li class="course-item">
+                                <div class="course-info">
+                                    <span class="course-code">{{ item.course.code }}</span>
+                                    <span class="course-name">{{ item.course.name }}</span>
+                                </div>
+                                <div class="course-badges">
+                                    {% if item.is_mandatory %}
+                                        <span class="badge badge-danger">Zorunlu</span>
+                                    {% endif %}
+                                    <span class="badge badge-secondary">#{{ item.priority_order }}</span>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    {% if cart|length > 5 %}
+                        <p class="more-items">+{{ cart|length - 5 }} ders daha...</p>
+                    {% endif %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>Sepetiniz boş</p>
+                        <a href="{{ url_for('student.course_catalog') }}" class="btn btn-primary btn-sm">
+                            Ders Ekle
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Kayıtlı Dersler -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h2><i class="fas fa-check-circle"></i> Kayıtlı Dersler</h2>
+                <a href="{{ url_for('student.schedule') }}" class="btn btn-sm btn-outline">Program</a>
+            </div>
+            <div class="card-body">
+                {% if enrollments %}
+                    <ul class="course-list">
+                        {% for item in enrollments[:5] %}
+                            <li class="course-item">
+                                <div class="course-info">
+                                    <span class="course-code">{{ item.course.code }}</span>
+                                    <span class="course-name">{{ item.course.name }}</span>
+                                </div>
+                                <span class="badge badge-success">Kayıtlı</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-times"></i>
+                        <p>Henüz kayıtlı dersiniz yok</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Bekleme Listesi -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h2><i class="fas fa-clock"></i> Bekleme Listesi</h2>
+            </div>
+            <div class="card-body">
+                {% if waitlist %}
+                    <ul class="course-list">
+                        {% for item in waitlist %}
+                            <li class="course-item">
+                                <div class="course-info">
+                                    <span class="course-code">{{ item.course.code }}</span>
+                                    <span class="course-name">{{ item.course.name }}</span>
+                                </div>
+                                <span class="badge badge-warning">Sıra: {{ item.position }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-hourglass-half"></i>
+                        <p>Bekleme listeniz boş</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

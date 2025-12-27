@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}Sepetim{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <h1><i class="fas fa-shopping-cart"></i> Sepetim</h1>
+        <p>Ders taleplerini yönetin, öncelik sırası belirleyin.</p>
+    </div>
+    
+    {% if cart %}
+        <div class="cart-container">
+            <!-- Doğrulama Mesajları -->
+            {% if validation.issues or validation.warnings %}
+                <div class="validation-section">
+                    {% if validation.issues %}
+                        <div class="alert alert-danger">
+                            <h4><i class="fas fa-exclamation-circle"></i> Hatalar</h4>
+                            <ul>
+                                {% for issue in validation.issues %}
+                                    <li>{{ issue }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    
+                    {% if validation.warnings %}
+                        <div class="alert alert-warning">
+                            <h4><i class="fas fa-exclamation-triangle"></i> Uyarılar</h4>
+                            <ul>
+                                {% for warning in validation.warnings %}
+                                    <li>{{ warning }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+            
+            <!-- Çakışma Uyarıları -->
+            {% if conflicts.total_pending_conflicts > 0 %}
+                <div class="alert alert-danger">
+                    <h4><i class="fas fa-clock"></i> Çakışma Tespit Edildi!</h4>
+                    <p>Sepetinizdeki bazı derslerin saatleri çakışıyor. Kayıt simülasyonunda düşük öncelikli ders otomatik olarak reddedilecektir.</p>
+                    <ul>
+                        {% for pair in conflicts.pending_conflicts %}
+                            <li>
+                                <strong>{{ pair.course1.code }}</strong> ile 
+                                <strong>{{ pair.course2.code }}</strong> çakışıyor
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            
+            <!-- Sepet Listesi -->
+            <div class="cart-list" id="cartList">
+                {% for item in cart %}
+                    <div class="cart-item" data-course-id="{{ item.course.id }}">
+                        <div class="cart-item-drag">
+                            <i class="fas fa-grip-vertical"></i>
+                        </div>
+                        
+                        <div class="cart-item-order">
+                            <span class="order-number">#{{ item.priority_order }}</span>
+                        </div>
+                        
+                        <div class="cart-item-info">
+                            <div class="course-code">{{ item.course.code }}</div>
+                            <div class="course-name">{{ item.course.name }}</div>
+                            <div class="course-meta">
+                                <span><i class="fas fa-clock"></i> {{ item.course.schedule }}</span>
+                                <span><i class="fas fa-graduation-cap"></i> {{ item.course.credit }} Kredi</span>
+                                <span class="quota-info {% if item.course.fill_percentage >= 80 %}text-danger{% endif %}">
+                                    <i class="fas fa-users"></i> {{ item.course.enrolled_count }}/{{ item.course.quota }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="cart-item-badges">
+                            {% if item.is_mandatory %}
+                                <span class="badge badge-danger">
+                                    <i class="fas fa-star"></i> Zorunlu
+                                </span>
+                            {% endif %}
+                            
+                            <span class="badge badge-{{ item.course.course_type }}">
+                                {% if item.course.course_type == 'required' %}Zorunlu Ders
+                                {% elif item.course.course_type == 'elective' %}Seçmeli
+                                {% else %}Teknik Seçmeli{% endif %}
+                            </span>
+                        </div>
+                        
+                        <div class="cart-item-actions">
+                            <form method="POST" action="{{ url_for('student.toggle_mandatory', course_id=item.course.id) }}" style="display: inline;">
+                                <button type="submit" class="btn btn-sm {% if item.is_mandatory %}btn-warning{% else %}btn-outline{% endif %}" title="Zorunlu İşaretle">
+                                    <i class="fas fa-star"></i>
+                                </button>
+                            </form>
+                            
+                            <a href="{{ url_for('student.course_detail', course_id=item.course.id) }}" class="btn btn-sm btn-outline" title="Detay">
+                                <i class="fas fa-info-circle"></i>
+                            </a>
+                            
+                            <form method="POST" action="{{ url_for('student.remove_from_cart', course_id=item.course.id) }}" style="display: inline;">
+                                <button type="submit" class="btn btn-sm btn-danger" title="Kaldır">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Sepet Özeti -->
+            <div class="cart-summary">
+                <div class="summary-stats">
+                    <div class="stat">
+                        <span class="stat-label">Toplam Ders</span>
+                        <span class="stat-value">{{ cart|length }}</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Toplam Kredi</span>
+                        <span class="stat-value">{{ cart|sum(attribute='course.credit') }}</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Zorunlu İşaretli</span>
+                        <span class="stat-value">{{ cart|selectattr('is_mandatory')|list|length }}</span>
+                    </div>
+                </div>
+                
+                <div class="summary-actions">
+                    <form method="POST" action="{{ url_for('student.clear_cart') }}" onsubmit="return confirm('Sepetinizi temizlemek istediğinize emin misiniz?');">
+                        <button type="submit" class="btn btn-outline btn-danger">
+                            <i class="fas fa-trash-alt"></i> Sepeti Temizle
+                        </button>
+                    </form>
+                    
+                    <a href="{{ url_for('student.course_catalog') }}" class="btn btn-outline">
+                        <i class="fas fa-plus"></i> Ders Ekle
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Bilgi Notu -->
+            <div class="info-note">
+                <i class="fas fa-info-circle"></i>
+                <p>
+                    <strong>Öncelik Sırası:</strong> Sıralamanız, çakışma durumunda hangi dersin öncelikli olacağını belirler. 
+                    Üstteki dersler daha yüksek önceliğe sahiptir. "Zorunlu" işaretli dersler çakışma durumunda her zaman önceliklidir.
+                </p>
+            </div>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-shopping-cart"></i>
+            <h2>Sepetiniz Boş</h2>
+            <p>Henüz ders eklemediniz. Ders kataloğundan derslerinizi seçebilirsiniz.</p>
+            <a href="{{ url_for('student.course_catalog') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-search"></i> Ders Kataloğuna Git
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Sürükle-bırak için basit implementasyon (ileride geliştirilebilir)
+document.addEventListener('DOMContentLoaded', function() {
+    const cartList = document.getElementById('cartList');
+    if (cartList) {
+        const items = cartList.querySelectorAll('.cart-item');
+        items.forEach(item => {
+            item.setAttribute('draggable', 'true');
+        });
+    }
+});
+</script>
+{% endblock %}

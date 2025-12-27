@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Raporlar{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="page-header">
+        <h1><i class="fas fa-chart-bar"></i> Raporlar</h1>
+        <p>Sistem istatistikleri ve analizler</p>
+    </div>
+    
+    <div class="reports-grid">
+        <!-- En Dolu Dersler -->
+        <div class="report-card">
+            <h3><i class="fas fa-fire"></i> En Dolu Dersler</h3>
+            <div class="course-bars">
+                {% for item in most_filled %}
+                    <div class="course-bar-item">
+                        <div class="course-bar-header">
+                            <span class="course-code">{{ item.course.code }}</span>
+                            <span class="fill-rate">%{{ item.fill_rate }}</span>
+                        </div>
+                        <div class="progress-bar">
+                            {% set width_val = item.fill_rate|default(0) %}
+                            <div class="progress-fill {% if item.fill_rate >= 90 %}bg-danger{% elif item.fill_rate >= 70 %}bg-warning{% else %}bg-success{% endif %}" 
+                                 style="width: {{ width_val }}%"></div>
+                        </div>
+                        <span class="course-name">{{ item.course.name }}</span>
+                    </div>
+                {% else %}
+                    <p class="text-muted">Veri yok</p>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Öncelik Dağılımı -->
+        <div class="report-card">
+            <h3><i class="fas fa-sort-amount-up"></i> Öğrenci Öncelik Dağılımı</h3>
+            {% set high = priority_distribution.high|default(0) %}
+            {% set medium = priority_distribution.medium|default(0) %}
+            {% set low = priority_distribution.low|default(0) %}
+            {% set total = high + medium + low %}
+            {% set high_height = ((high / total) * 200)|round|int if total > 0 else 0 %}
+            {% set medium_height = ((medium / total) * 200)|round|int if total > 0 else 0 %}
+            {% set low_height = ((low / total) * 200)|round|int if total > 0 else 0 %}
+            <div class="priority-distribution">
+                <div class="distribution-item">
+                    <div class="distribution-bar high" style="height: {{ high_height }}px"></div>
+                    <span class="distribution-count">{{ high }}</span>
+                    <span class="distribution-label">Yüksek (70+)</span>
+                </div>
+                <div class="distribution-item">
+                    <div class="distribution-bar medium" style="height: {{ medium_height }}px"></div>
+                    <span class="distribution-count">{{ medium }}</span>
+                    <span class="distribution-label">Orta (40-70)</span>
+                </div>
+                <div class="distribution-item">
+                    <div class="distribution-bar low" style="height: {{ low_height }}px"></div>
+                    <span class="distribution-count">{{ low }}</span>
+                    <span class="distribution-label">Düşük (0-40)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}{{ student.full_name }} - Öğrenci Detay{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="breadcrumb">
+        <a href="{{ url_for('admin.students') }}"><i class="fas fa-arrow-left"></i> Öğrenci Listesi</a>
+    </div>
+    
+    <div class="student-detail-container">
+        <div class="student-header">
+            <div class="student-avatar">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <div class="student-info">
+                <h1>{{ student.full_name }}</h1>
+                <p class="student-number">{{ student.student_number }}</p>
+                <p class="student-dept">{{ student.department }} - {{ student.faculty }}</p>
+            </div>
+            <a href="{{ url_for('admin.edit_student', student_id=student.id) }}" class="btn btn-primary">
+                <i class="fas fa-edit"></i> Düzenle
+            </a>
+        </div>
+        
+        <div class="detail-grid">
+            <!-- Akademik Bilgiler -->
+            <div class="detail-card">
+                <h3><i class="fas fa-graduation-cap"></i> Akademik Bilgiler</h3>
+                <div class="info-list">
+                    <div class="info-item">
+                        <span class="label">Sınıf</span>
+                        <span class="value">{{ student.class_level }}. Sınıf</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Not Ortalaması</span>
+                        <span class="value">{{ "%.2f"|format(student.gpa) }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Mezuniyete Kalan Ders</span>
+                        <span class="value">{{ student.remaining_courses }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Özel Durum</span>
+                        <span class="value">{{ priority.breakdown.special_status.description }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Öncelik Bilgisi -->
+            <div class="detail-card">
+                <h3><i class="fas fa-sort-amount-up"></i> Öncelik Puanı</h3>
+                <div class="priority-display">
+                    <div class="priority-score-large">{{ "%.1f"|format(priority.total_score) }}</div>
+                    <div class="priority-bars">
+                        <div class="bar-item">
+                            <span>Sınıf: {{ "%.1f"|format(priority.breakdown.class_level.score) }}</span>
+                        </div>
+                        <div class="bar-item">
+                            <span>Kalan Ders: {{ "%.1f"|format(priority.breakdown.remaining_courses.score) }}</span>
+                        </div>
+                        <div class="bar-item">
+                            <span>GPA: {{ "%.1f"|format(priority.breakdown.gpa.score) }}</span>
+                        </div>
+                        <div class="bar-item">
+                            <span>Özel Durum: {{ "%.1f"|format(priority.breakdown.special_status.score) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sepet -->
+            <div class="detail-card">
+                <h3><i class="fas fa-shopping-cart"></i> Sepet ({{ cart|length }} ders)</h3>
+                {% if cart %}
+                    <ul class="simple-list">
+                        {% for item in cart %}
+                            <li>
+                                <strong>{{ item.course.code }}</strong> - {{ item.course.name }}
+                                {% if item.is_mandatory %}<span class="badge badge-danger">Zorunlu</span>{% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">Sepet boş</p>
+                {% endif %}
+            </div>
+            
+            <!-- Kayıtlar -->
+            <div class="detail-card">
+                <h3><i class="fas fa-check-circle"></i> Kayıtlı Dersler ({{ enrollments|length }})</h3>
+                {% if enrollments %}
+                    <ul class="simple-list">
+                        {% for item in enrollments %}
+                            <li>
+                                <strong>{{ item.course.code }}</strong> - {{ item.course.name }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">Kayıtlı ders yok</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

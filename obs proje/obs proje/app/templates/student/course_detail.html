@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block title %}{{ course.code }} - {{ course.name }}{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="breadcrumb">
+        <a href="{{ url_for('student.course_catalog') }}"><i class="fas fa-arrow-left"></i> Ders Kataloğu</a>
+    </div>
+    
+    <div class="course-detail-container">
+        <!-- Ana Bilgiler -->
+        <div class="course-detail-header">
+            <div class="course-main-info">
+                <span class="course-code-large">{{ course.code }}</span>
+                <h1>{{ course.name }}</h1>
+                <div class="course-meta">
+                    <span class="badge badge-{{ course.course_type }}">
+                        {% if course.course_type == 'required' %}Zorunlu
+                        {% elif course.course_type == 'elective' %}Seçmeli
+                        {% else %}Teknik Seçmeli{% endif %}
+                    </span>
+                    <span class="meta-item"><i class="fas fa-graduation-cap"></i> {{ course.credit }} Kredi</span>
+                    <span class="meta-item"><i class="fas fa-star"></i> {{ course.ects }} AKTS</span>
+                </div>
+            </div>
+            
+            <div class="course-actions-panel">
+                {% if enrolled %}
+                    <div class="status-badge enrolled">
+                        <i class="fas fa-check-circle"></i> Bu Derse Kayıtlısınız
+                    </div>
+                {% elif in_cart %}
+                    <div class="status-badge in-cart">
+                        <i class="fas fa-shopping-cart"></i> Sepetinizde
+                    </div>
+                    <form method="POST" action="{{ url_for('student.remove_from_cart', course_id=course.id) }}">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-times"></i> Sepetten Çıkar
+                        </button>
+                    </form>
+                {% elif course.is_full %}
+                    <div class="status-badge full">
+                        <i class="fas fa-ban"></i> Kontenjan Dolu
+                    </div>
+                {% else %}
+                    <form method="POST" action="{{ url_for('student.add_to_cart', course_id=course.id) }}">
+                        <div class="add-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="is_mandatory" value="true">
+                                <span>Zorunlu olarak işaretle</span>
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-plus"></i> Sepete Ekle
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="course-detail-grid">
+            <!-- Sol Panel -->
+            <div class="detail-panel">
+                <!-- Kontenjan -->
+                <div class="detail-card">
+                    <h3><i class="fas fa-users"></i> Kontenjan Durumu</h3>
+                    <div class="quota-display">
+                        <div class="quota-bar large">
+                            <div class="quota-fill {% if course.fill_percentage >= 90 %}quota-danger{% elif course.fill_percentage >= 70 %}quota-warning{% endif %}" 
+                                 style="width: {{ course.fill_percentage }}%"></div>
+                        </div>
+                        <div class="quota-stats">
+                            <div class="stat">
+                                <span class="stat-value">{{ course.enrolled_count }}</span>
+                                <span class="stat-label">Kayıtlı</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">{{ course.available_quota }}</span>
+                                <span class="stat-label">Kalan</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">{{ course.quota }}</span>
+                                <span class="stat-label">Toplam</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ders Programı -->
+                <div class="detail-card">
+                    <h3><i class="fas fa-calendar-alt"></i> Ders Saatleri</h3>
+                    <div class="schedule-list">
+                        {% for sched in course.schedules %}
+                            <div class="schedule-item">
+                                <span class="schedule-day">{{ sched.day }}</span>
+                                <span class="schedule-time">{{ sched.start_time }} - {{ sched.end_time }}</span>
+                                {% if sched.classroom %}
+                                    <span class="schedule-room"><i class="fas fa-door-open"></i> {{ sched.classroom }}</span>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <p class="no-data">Program bilgisi yok</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Bölüm Bilgisi -->
+                <div class="detail-card">
+                    <h3><i class="fas fa-building"></i> Bölüm/Fakülte</h3>
+                    <p><strong>Bölüm:</strong> {{ course.department }}</p>
+                    <p><strong>Fakülte:</strong> {{ course.faculty }}</p>
+                </div>
+            </div>
+            
+            <!-- Sağ Panel -->
+            <div class="detail-panel">
+                <!-- Ön Şart Kontrolü -->
+                <div class="detail-card {% if not prereq_result.can_enroll %}card-warning{% endif %}">
+                    <h3><i class="fas fa-link"></i> Ön Şart Kontrolü</h3>
+                    
+                    {% if prereq_result.chain_details %}
+                        {% if prereq_result.can_enroll %}
+                            <div class="prereq-status success">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Tüm ön şartları sağlıyorsunuz</span>
+                            </div>
+                        {% else %}
+                            <div class="prereq-status error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>Eksik ön şartlar var</span>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="prereq-details">
+                            {% for prereq in prereq_result.completed_prerequisites %}
+                                <div class="prereq-item completed">
+                                    <i class="fas fa-check"></i>
+                                    <span>{{ prereq.code }}</span>
+                                    <span class="grade">({{ prereq.grade }})</span>
+                                </div>
+                            {% endfor %}
+                            
+                            {% for prereq in prereq_result.missing_prerequisites %}
+                                <div class="prereq-item missing">
+                                    <i class="fas fa-times"></i>
+                                    <span>{{ prereq.code }}</span>
+                                    <span class="reason">({{ prereq.reason }})</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="prereq-status success">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Bu dersin ön şartı yok</span>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Çakışma Kontrolü -->
+                <div class="detail-card {% if conflict_result.has_conflict %}card-danger{% endif %}">
+                    <h3><i class="fas fa-clock"></i> Çakışma Kontrolü</h3>
+                    
+                    {% if conflict_result.has_conflict %}
+                        <div class="conflict-status error">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>Saat çakışması tespit edildi!</span>
+                        </div>
+                        
+                        <div class="conflict-details">
+                            {% for course in conflict_result.conflicting_courses %}
+                                <div class="conflict-item">
+                                    <span class="conflict-code">{{ course.code }}</span>
+                                    <span class="conflict-name">{{ course.name }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="conflict-status success">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Mevcut programınızla çakışma yok</span>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Açıklama -->
+                {% if course.description %}
+                    <div class="detail-card">
+                        <h3><i class="fas fa-info-circle"></i> Ders Açıklaması</h3>
+                        <p>{{ course.description }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
