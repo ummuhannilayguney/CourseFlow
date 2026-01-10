@@ -1,0 +1,19 @@
+﻿# dependencies
+node_modules/
+
+# env files
+.env
+.env.*
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# build outputs
+dist/
+build/
