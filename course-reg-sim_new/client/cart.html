@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Sepet</title>
+  <link rel="stylesheet" href="/styles.css"/>
+</head>
+<body data-page="cart">
+  <div class="navbar">
+    <div class="container navbar-inner">
+      <a class="brand" href="/dashboard.html">
+        <img src="/assets/btu-logo.png" alt="BTU Logo"/>
+        <span>Bursa Technical University</span>
+      </a>
+      <div class="navlinks">
+        <a href="/dashboard.html">Kontrol Paneli</a>
+        <a href="/catalog.html">Katalog</a>
+        <a href="/cart.html">Sepet</a>
+        <a href="/simulate.html">Simülasyon</a>
+        <a href="/admin.html">Admin</a>
+      </div>
+      <div class="right-actions">
+        <div class="pill" id="userPill"></div>
+      </div>
+    </div>
+  </div>
+
+  <main class="main">
+    <div class="container">
+      <div class="h1">Öğrenci ders sepeti</div>
+      <div class="h2">Required işaretle, sırala, kaydet</div>
+
+      <div class="card">
+        <button class="btn" id="saveCartBtn">Sepeti Kaydet</button>
+        <div class="small mt12">Bu sayfa test öğrenci içindir. Login → Öğrenci girişi yap.</div>
+      </div>
+
+      <div id="cartRoot" class="mt12"></div>
+    </div>
+  </main>
+
+  <script src="/api.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
