@@ -42,9 +42,3 @@ course-reg-sim/
 │   └── client/             # 🖥️ Hafif Ön Yüz (Vanilla JS)
 └── package.json
 
-🛠 Teknoloji YığınıBileşenTeknolojiAçıklamaBackendNode.jsÇalışma zamanı ortamıFrameworkExpress.jsRESTful API mimarisiMantıkJavaScript (ES6+)Çekirdek simülasyon algoritmalarıFrontendHTML5 / CSS3Semantik işaretleme ve stilİstemciVanilla JSDOM manipülasyonu ve API tüketimi🚀 Kurulum ve BaşlangıçGereksinimlerBilgisayarınızda aşağıdakilerin kurulu olduğundan emin olun:Node.js (v16.0.0 veya üzeri)npm (v7.0.0 veya üzeri)Kurulum AdımlarıRepoyu klonlayınBashgit clone [https://github.com/kullanici-adiniz/course-reg-sim.git](https://github.com/kullanici-adiniz/course-reg-sim.git)
-cd course-reg-sim
-Bağımlılıkları yükleyinSunucu dizinine gidin ve gerekli paketleri yükleyin.Bashcd server
-npm install
-Uygulamayı ÇalıştırınGeliştirme sunucusunu başlatın:Bashnpm start
-API şu adreste çalışacaktır: http://localhost:3000Arayüze şu adresten erişebilirsiniz: http://localhost:3000/index.html🧪 Simülasyon SenaryolarıSistem, mantığı test etmeniz için belirli senaryoları çalıştırmanıza olanak tanır:Yüksek Talep Senaryosu: 50 kişilik bir derse aynı anda kayıt olmaya çalışan 500 öğrenciyi simüle eder.Çakışma Zinciri: Sistemin, çakışan 3 derse sahip bir programı reddetme yeteneğini test eder.Önkoşul Başarısızlığı: Bir öğrencinin "Giriş" dersini almadan "İleri Seviye" dersini alamayacağını doğrular.
