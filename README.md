@@ -1,141 +1,43 @@
-🎓 Course Registration Simulation System
+# 🎓 Üniversite Ders Kayıt Simülasyon Sistemi
 
-A full-stack course registration simulation system designed to model real-world university enrollment processes such as prerequisites, time conflicts, priorities, quotas, and waitlists.
+![Lisans](https://img.shields.io/badge/license-MIT-blue.svg) ![Node.js](https://img.shields.io/badge/node-%3E%3D16.0.0-green) ![Durum](https://img.shields.io/badge/status-aktif-success)
 
-This project is suitable for academic research, software engineering coursework, and system behavior analysis.
+> Önkoşullar, ders çakışmaları, öncelik algoritmaları ve kota yönetimi gibi karmaşık üniversite kayıt dinamiklerini modelleyen full-stack bir simülasyon motoru.
 
-🚀 Features
+## 📖 Proje Hakkında
 
-🧑‍🎓 Student course enrollment simulation
+Bu proje, gerçek dünyadaki akademik kayıt senaryolarını simüle etmek ve analiz etmek için tasarlanmış kapsamlı bir **Ders Kayıt Sistemi**dir. Standart kayıt portallarının aksine, bu sistem; zaman çakışmaları, yoğun yük ve karmaşık önkoşul zincirleri gibi çeşitli kısıtlamalara karşı kayıt mantığını "stres testine" tabi tutabilen özel bir simülasyon motoruna sahiptir.
 
-📚 Course catalog management
+Hem işlevsel bir web uygulaması hem de akademik araştırmalar, sistem davranışı analizi ve algoritmik optimizasyon çalışmaları için bir araç olarak hizmet verir.
 
-⏱ Time conflict detection
+## ✨ Temel Özellikler
 
-🔐 Prerequisite validation
+### Çekirdek Simülasyon Mantığı
+* **Çakışma Tespit Motoru:** Öğrenci ders programlarındaki zamansal örtüşmelerin gerçek zamanlı analizi.
+* **Önkoşul Zinciri Doğrulama:** Akademik uygunluğu sağlamak için yinelemeli (recursive) tarama.
+* **Öncelik Tabanlı Kayıt:** Kıdem, GPA veya bölüm gereksinimlerine göre ağırlıklandırılmış sıralama algoritmaları.
+* **Dinamik Kota Yönetimi:** Ders kapasiteleri ve bekleme listelerinin (Waitlist) tutarlı ve güvenli yönetimi.
 
-⭐ Priority-based enrollment
+### Analiz ve Raporlama
+* **Performans Metrikleri:** Kayıt başarı oranları ve sistem tıkanıklıkları hakkında detaylı istatistikler.
+* **Bekleme Listesi Mantığı:** Otomatik yükseltme özellikli FIFO (İlk Giren İlk Çıkar) işleme yapısı.
 
-📊 Metrics & performance analysis
+## 🏗 Sistem Mimarisi
 
-📝 Waitlist handling
+Proje, simülasyon mantığını API katmanından ve arayüz sunumundan ayıran modüler bir **MVC (Model-View-Controller)** yapısını takip eder.
 
-🧪 Simulation engine for enrollment scenarios
-
-🌐 Simple web-based UI (HTML/CSS/JS)
-
-🏗 Project Architecture
+```bash
 course-reg-sim/
-│
 ├── server/
 │   ├── src/
-│   │   ├── core/        # Core simulation logic
-│   │   │   ├── catalog.js
-│   │   │   ├── conflict.js
-│   │   │   ├── prereq.js
-│   │   │   ├── priority.js
-│   │   │   ├── simulate.js
-│   │   │   ├── waitlist.js
-│   │   │   └── metrics.js
-│   │   │
-│   │   ├── routes/      # Express routes
-│   │   ├── data/        # Seed data
-│   │   ├── config/      # Auth & configuration
-│   │   └── index.js     # Server entry point
-│   │
-│   └── client/          # Frontend (HTML/JS/CSS)
-│
-├── package.json
-└── package-lock.json
-
-🧰 Tech Stack
-
-Backend
-
-Node.js
-
-Express.js
-
-Frontend
-
-HTML5
-
-CSS3
-
-Vanilla JavaScript
-
-Other
-
-RESTful API design
-
-Modular simulation engine
-
-⚙️ Installation & Setup
-Prerequisites
-
-Node.js (v16+ recommended)
-
-npm
-
-Installation
-git clone https://github.com/your-username/course-reg-sim.git
-cd course-reg-sim/server
-npm install
-
-Run the Server
-npm start
-
-
-Server will run on:
-
-http://localhost:3000
-
-🖥 Usage
-
-Access the UI via browser (index.html)
-
-Login as admin or student
-
-Browse course catalog
-
-Run enrollment simulations
-
-Analyze results via metrics
-
-🧪 Simulation Logic
-
-The system simulates real-world constraints such as:
-
-Course capacity limits
-
-Student priority levels
-
-Time slot overlaps
-
-Mandatory prerequisites
-
-Automated waitlist management
-
-Simulation logic is modular and extensible.
-
-📊 Metrics
-
-The system tracks:
-
-Enrollment success rates
-
-Course demand
-
-Waitlist statistics
-
-Conflict frequencies
-
-Useful for academic analysis and optimization studies.
-
-📄 License
-
-This project is licensed under the MIT License.
-
-👤 Author
-
-Developed for academic and simulation-based research purposes.
+│   │   ├── core/           # 🧠 Beyin: Simülasyon Algoritmaları
+│   │   │   ├── catalog.js  # Ders yönetimi
+│   │   │   ├── conflict.js # Zaman çakışması tespiti
+│   │   │   ├── prereq.js   # Gereksinim mantık grafiği
+│   │   │   ├── priority.js # Sıralama algoritmaları
+│   │   │   └── simulate.js # Ana simülasyon döngüsü
+│   │   ├── routes/         # REST API Uç Noktaları
+│   │   ├── config/         # Ortam ve Yetkilendirme Ayarları
+│   │   └── index.js        # Sunucu Giriş Noktası
+│   └── client/             # 🖥️ Hafif Ön Yüz (Vanilla JS)
+└── package.json
