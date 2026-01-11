@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Kontrol Paneli</title>
+  <link rel="stylesheet" href="/styles.css"/>
+</head>
+<body data-page="dashboard">
+  <div class="navbar">
+    <div class="container navbar-inner">
+      <a class="brand" href="/dashboard.html">
+        <img src="/assets/btu-logo.png" alt="BTU Logo"/>
+        <span>Bursa Technical University</span>
+      </a>
+      <div class="navlinks">
+        <a href="/dashboard.html">Kontrol Paneli</a>
+        <a href="/catalog.html">Katalog</a>
+        <a href="/cart.html">Sepet</a>
+        <a href="/simulate.html">Simülasyon</a>
+        <a href="/admin.html">Admin</a>
+      </div>
+      <div class="right-actions">
+        <div class="pill" id="userPill"></div>
+      </div>
+    </div>
+  </div>
+
+  <main class="main">
+    <div class="container">
+      <div class="h1">Kontrol paneli</div>
+      <div class="h2">Simülasyon metrikleri ve doluluk görünümü</div>
+
+      <div id="metrics"></div>
+
+      <div id="studentResult" class="mt18"></div>
+
+      <div id="adminReport" class="mt18"></div>
+
+      <div class="card mt18">
+        <div style="font-weight:900; font-size:18px;">Dolulukta öne çıkan dersler</div>
+        <div id="topCourses" class="mt12"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/api.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

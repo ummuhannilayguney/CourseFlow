@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Giriş</title>
+  <link rel="stylesheet" href="/styles.css"/>
+</head>
+<body data-page="login">
+  <div class="navbar">
+    <div class="container navbar-inner">
+      <a class="brand" href="/index.html">
+        <img src="/assets/btu-logo.png" alt="BTU Logo"/>
+        <span>Bursa Technical University</span>
+      </a>
+      <div class="navlinks">
+        <a href="/index.html" class="active">Ana sayfa</a>
+      </div>
+      <div class="right-actions">
+        <div class="pill" id="userPill"></div>
+      </div>
+    </div>
+  </div>
+
+  <main class="main">
+    <div class="container">
+      <div class="h1">Giriş</div>
+      <div class="h2">Admin / Öğrenci giriş (test)</div>
+
+      <div class="grid">
+        <div class="card" style="grid-column: span 6;">
+          <h3>Admin Giriş</h3>
+          <form id="adminLoginForm">
+            <input class="input" id="adminPassword" placeholder="Admin şifre" type="password" required/>
+            <div class="mt12">
+              <button class="btn" type="submit">Admin Giriş</button>
+            </div>
+            <div class="small mt12">Şifre: .env içindeki ADMIN_PASSWORD</div>
+          </form>
+        </div>
+
+        <div class="card" style="grid-column: span 6;">
+          <h3>Öğrenci Giriş (Test)</h3>
+          <form id="studentLoginForm">
+            <input class="input" id="studentId" placeholder="Öğrenci ID" required/>
+            <div class="mt12"></div>
+            <input class="input" id="studentPassword" placeholder="Şifre" type="password" required/>
+            <div class="mt12">
+              <button class="btn" type="submit">Öğrenci Giriş</button>
+            </div>
+            <div class="small mt12">Test: .env → TEST_STUDENT_ID / TEST_STUDENT_PASSWORD</div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/api.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
