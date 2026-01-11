@@ -12,7 +12,7 @@ Gereksinim                          │ Uygulama Dosyası      │ Durum
 Ders kodu tutma                     │ seedCourses.js        │ ✅
 Ders adı tutma                      │ seedCourses.js        │ ✅
 Kontenjan tutma                     │ seedCourses.js        │ ✅
-Haftalık gün-saat bilgisi          │ time.js               │ ✅
+Haftalık gün-saat bilgisi           │ time.js               │ ✅
 Ön şart dersleri tutma              │ seedCourses.js        │ ✅
 Bölüm/fakülte bilgisi               │ seedCourses.js        │ ✅
 Arama performansı (O(1))            │ catalog.js (Map)      │ ✅
